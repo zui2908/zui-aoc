@@ -6,9 +6,10 @@
 
 void part1(char* file_name);
 void part2(char* file_name);
-int parse(char* input);
-int parse_2(char* input);
-int valid(char* input);
+int parse1(char* input);
+int parse2(char* input, int* enable);
+int valid1(char* input);
+int valid2(char* input);
 
 int main(int argc, char** argv) {
 	for (int i = 1; i < argc; i++) {
@@ -27,12 +28,10 @@ void part1(char* file_name) {
 		char* end = input;
 		int result = 0;
 		while (fgets(end, sizeof(input) - abs(end - input), fp)) {
-			// printf("Before: %s\n", input);
 			if (!*input) {goto end;}
-			result += parse(input);
+			result += parse1(input);
 			end = input;
 			while (*end) {end++;}
-			printf("%d\n", result);
 		}
 		end:
 		printf("Part 1 result: %d\n", result);
@@ -49,10 +48,10 @@ void part2(char* file_name) {
 		char input[13] = {0};
 		char* end = input;
 		int result = 0;
+		int enable = 1;
 		while (fgets(end, sizeof(input) - abs(end - input), fp)) {
-			// printf("Before: %s\n", input);
 			if (!*input) {goto end;}
-			result += parse_2(input);
+			result += parse2(input, &enable);
 			end = input;
 			while (*end) {end++;}
 			printf("%d\n", result);
@@ -65,14 +64,13 @@ void part2(char* file_name) {
 	fclose(fp);
 }
 
-int parse(char* input) {
+int parse1(char* input) {
 	char* start = input;
 	int arg1 = 0, arg2 = 0;
 	char end = 0;
 	while (*start) {
-		if (valid(start)) {
+		if (valid1(start)) {
 			if (sscanf(start, "mul(%3d,%3d%c", &arg1, &arg2, &end) == 3 || end == ')') {
-				printf("%s | %d\n", start, arg1 * arg2);
 				start++;
 				while (*start != 'm' && *start) {
 					start++;
@@ -90,7 +88,7 @@ int parse(char* input) {
 	return arg1 * arg2;
 }
 
-int valid(char* input) {
+int valid1(char* input) {
 	char f[] = "mul(#,#)";
 	char* ip = input;
 	char* fp = f;
@@ -130,45 +128,105 @@ int valid(char* input) {
 	return 0;
 }
 
-int valid_dodont(char* input) {
-	char d[] = "do()";
-	char dn[] = "don't()";
-}
-
-int parse_2(char* input) {
+int parse2(char* input, int* enable) {
 	char* start = input;
 	int arg1 = 0, arg2 = 0;
 	char end = 0;
-	int parse = 1;
 	while (*start) {
-		printf("%s\n", start);
-		if (parse) {
-			if (valid(start)) {
-				if (sscanf(start, "mul(%3d,%3d%c", &arg1, &arg2, &end) == 3 || end == ')') {
-					printf("%s | %d\n", start, arg1 * arg2);
-					start++;
-					while (*start != 'm' && *start != 'd' && *start) {
-						start++;
+		switch (valid2(start)) {
+			case 1: {
+				if (*enable) {
+					if (sscanf(start, "mul(%3d,%3d%c", &arg1, &arg2, &end) == 3 || end == ')') {
+						end = 0;
+					} else {
+						arg1 = 0;
+						arg2 = 0;
 					}
-					end = 0;
-				} else {
-					arg1 = 0;
-					arg2 = 0;
 				}
-				break;
+				do {
+					start++;
+				} while (*start && *start != 'm' && *start != 'd');
+				goto ret;
 			}
-			if (sscanf(start, "don't(%c", &end) && end == ')') {
-				parse = 0;
+			break;
+			case 2: {
+				*enable = 1;
 				end = 0;
+				do {
+					start++;
+				} while (*start && *start != 'm' && *start != 'd');
+				goto ret;
 			}
-		} else {
-			if (sscanf(start, "do(%c", &end) && end == ')') {
-				parse = 1;
+			break;
+			case 3: {
+				*enable = 0;
 				end = 0;
+				do {
+					start++;
+				} while (*start && *start != 'm' && *start != 'd');
+				goto ret;
 			}
+			break;
+			case -1:
+			case -2:
+			case -3: {
+				goto ret;
+			}
+			break;
+			default: {
+				start++;
+			}
+			break;
 		}
-		start++;
 	}
+	ret:
 	strcpy(input, start);
 	return arg1 * arg2;
+}
+
+int valid2(char* input) {
+	char f[][9] = {
+		"mul(#,#)",
+		"do()",
+		"don't()"
+	};
+	char* ip;
+	int dc, fi, fii;
+	fi = 0;
+	fii = 0;
+	reset_check:
+	ip = input;
+	dc = 0;
+	check:
+	while (*ip && f[fi][fii]) {
+		if (f[fi][fii] == '#') {
+			if (*ip >= '0' && *ip <= '9') {
+				dc++;
+				ip++;
+			} else {
+				if (dc) {
+					dc = 0;
+					fii++;
+					goto check;
+				} else {
+					return 0;
+				}
+			}
+			if (dc > 3) {
+				return 0;
+			}
+		} else if (f[fi][fii] == *ip) {
+			if (f[fi][fii] == ')') {
+				return fi + 1;
+			} else {
+				fii++;
+				ip++;
+			}
+		} else {
+			fi++;
+			fii = 0;
+			goto reset_check;
+		}
+	}
+	return -1 * (fi + 1);
 }
