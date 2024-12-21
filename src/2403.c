@@ -21,46 +21,37 @@ int main(int argc, char** argv) {
 }
 
 void part1(char* file_name) {
-	FILE* fp;
-	fp = fopen(file_name, "r");
-	if (fp) {
-		char input[13] = {0};
-		char* end = input;
-		int result = 0;
-		while (fgets(end, sizeof(input) - abs(end - input), fp)) {
-			if (!*input) {goto end;}
-			result += parse1(input);
-			end = input;
-			while (*end) {end++;}
-		}
-		end:
-		printf("Part 1 result: %d\n", result);
-	} else {
-		printf("No such file found\n");
+	FILE* fp = fopen(file_name, "r");
+	if (!fp) {printf("Error opening file\n");return;}
+	char input[13] = {0};
+	char* end = input;
+	int result = 0;
+	while (fgets(end, sizeof(input) - abs(end - input), fp)) {
+		if (!*input) {goto end;}
+		result += parse1(input);
+		end = input;
+		while (*end) {end++;}
 	}
+	end:
+	printf("Part 1 result: %d\n", result);
 	fclose(fp);
 }
 
 void part2(char* file_name) {
-	FILE* fp;
-	fp = fopen(file_name, "r");
-	if (fp) {
-		char input[13] = {0};
-		char* end = input;
-		int result = 0;
-		int enable = 1;
-		while (fgets(end, sizeof(input) - abs(end - input), fp)) {
-			if (!*input) {goto end;}
-			result += parse2(input, &enable);
-			end = input;
-			while (*end) {end++;}
-			printf("%d\n", result);
-		}
-		end:
-		printf("Part 2 result: %d\n", result);
-	} else {
-		printf("No such file found\n");
+	FILE* fp = fopen(file_name, "r");
+	if (!fp) {printf("Error opening file\n");return;}
+	char input[13] = {0};
+	char* end = input;
+	int result = 0;
+	int enable = 1;
+	while (fgets(end, sizeof(input) - abs(end - input), fp)) {
+		if (!*input) {goto end;}
+		result += parse2(input, &enable);
+		end = input;
+		while (*end) {end++;}
 	}
+	end:
+	printf("Part 2 result: %d\n", result);
 	fclose(fp);
 }
 

@@ -21,42 +21,34 @@ int main(int argc, char** argv) {
 }
 
 void part1(char* file_name) {
-	FILE* fp;
-	fp = fopen(file_name, "r");
-	if (fp) {
-		char input[120] = {0};
-		int levels[10] = {0};
-		int result;
-		result = 0;
-		while (fgets(input, sizeof input, fp)) {
-			if (strlen(input) < 3) {break;}
-			int count = sscanf(input, "%d%d%d%d%d%d%d%d%d%d", &levels[0], &levels[1], &levels[2], &levels[3], &levels[4], &levels[5], &levels[6], &levels[7], &levels[8], &levels[9]);
-			result += safe1(levels, count);
-		}
-		printf("Part 1 result: %d\n", result);
-	} else {
-		printf("No such file found\n");
+	FILE* fp = fopen(file_name, "r");
+	if (!fp) {printf("Error opening file\n");return;}
+	char input[120] = {0};
+	int levels[10] = {0};
+	int result;
+	result = 0;
+	while (fgets(input, sizeof input, fp)) {
+		if (strlen(input) < 3) {break;}
+		int count = sscanf(input, "%d%d%d%d%d%d%d%d%d%d", &levels[0], &levels[1], &levels[2], &levels[3], &levels[4], &levels[5], &levels[6], &levels[7], &levels[8], &levels[9]);
+		result += safe1(levels, count);
 	}
+	printf("Part 1 result: %d\n", result);
 	fclose(fp);
 }
 
 void part2(char* file_name) {
-	FILE* fp;
-	fp = fopen(file_name, "r");
-	if (fp) {
-		char input[120] = {0};
-		int levels[10] = {0};
-		int result;
-		result = 0;
-		while (fgets(input, sizeof input, fp)) {
-			if (strlen(input) < 3) {break;}
-			int count = sscanf(input, "%d%d%d%d%d%d%d%d%d%d", &levels[0], &levels[1], &levels[2], &levels[3], &levels[4], &levels[5], &levels[6], &levels[7], &levels[8], &levels[9]);
-			result += safe2(levels, count);
-		}
-		printf("Part 2 result: %d\n", result);
-	} else {
-		printf("No such file found\n");
+	FILE* fp = fopen(file_name, "r");
+	if (!fp) {printf("Error opening file\n");return;}
+	char input[120] = {0};
+	int levels[10] = {0};
+	int result;
+	result = 0;
+	while (fgets(input, sizeof input, fp)) {
+		if (strlen(input) < 3) {break;}
+		int count = sscanf(input, "%d%d%d%d%d%d%d%d%d%d", &levels[0], &levels[1], &levels[2], &levels[3], &levels[4], &levels[5], &levels[6], &levels[7], &levels[8], &levels[9]);
+		result += safe2(levels, count);
 	}
+	printf("Part 2 result: %d\n", result);
 	fclose(fp);
 }
 
